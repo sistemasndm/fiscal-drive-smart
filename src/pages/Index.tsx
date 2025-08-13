@@ -15,12 +15,9 @@ import Header from "@/components/Header";
 import ModuleCard from "@/components/ModuleCard";
 import StatsCard from "@/components/StatsCard";
 import FiscalApp from "./FiscalApp";
-import TotemApp from "./TotemApp";
-import AdminPanel from "./AdminPanel";
-import AutomaticAuction from "./AutomaticAuction";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<"dashboard" | "fiscal" | "totem" | "admin" | "automatic">("dashboard");
+  const [currentView, setCurrentView] = useState<"dashboard" | "fiscal">("dashboard");
 
   const modules = [
     {
@@ -50,8 +47,8 @@ const Index = () => {
         "Emissão de ticket digital",
         "Interface responsiva"
       ],
-      status: "active" as const,
-      onAccess: () => setCurrentView("totem")
+      status: "beta" as const,
+      onAccess: () => console.log("Acessar Totem")
     },
     {
       title: "Painel Administrativo",
@@ -65,8 +62,8 @@ const Index = () => {
         "Analytics de infrações",
         "Integração municipal"
       ],
-      status: "active" as const,
-      onAccess: () => setCurrentView("admin")
+      status: "coming-soon" as const,
+      onAccess: () => console.log("Em desenvolvimento")
     },
     {
       title: "Sistema de Autuação",
@@ -80,8 +77,8 @@ const Index = () => {
         "Notificações SMS/Email",
         "Sistema de contestação"
       ],
-      status: "active" as const,
-      onAccess: () => setCurrentView("automatic")
+      status: "coming-soon" as const,
+      onAccess: () => console.log("Em desenvolvimento")
     }
   ];
 
@@ -118,18 +115,6 @@ const Index = () => {
 
   if (currentView === "fiscal") {
     return <FiscalApp onBack={() => setCurrentView("dashboard")} />;
-  }
-
-  if (currentView === "totem") {
-    return <TotemApp onBack={() => setCurrentView("dashboard")} />;
-  }
-
-  if (currentView === "admin") {
-    return <AdminPanel onBack={() => setCurrentView("dashboard")} />;
-  }
-
-  if (currentView === "automatic") {
-    return <AutomaticAuction onBack={() => setCurrentView("dashboard")} />;
   }
 
   return (
