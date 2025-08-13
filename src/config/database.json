@@ -1,0 +1,133 @@
+{
+  "mysql_connection": {
+    "host": "${MYSQL_HOST}",
+    "port": "${MYSQL_PORT}",
+    "username": "${MYSQL_USERNAME}",
+    "password": "${MYSQL_PASSWORD}",
+    "database": "${MYSQL_DATABASE}",
+    "ssl": true,
+    "timeout": 30000
+  },
+  "api_endpoints": {
+    "base_url": "${API_BASE_URL}",
+    "auth_token": "${API_AUTH_TOKEN}",
+    "endpoints": {
+      "vehicles": {
+        "search": "/api/vehicles/search",
+        "register": "/api/vehicles/register",
+        "update": "/api/vehicles/update",
+        "history": "/api/vehicles/history"
+      },
+      "tickets": {
+        "validate": "/api/tickets/validate",
+        "create": "/api/tickets/create",
+        "expire": "/api/tickets/expire",
+        "payment": "/api/tickets/payment"
+      },
+      "infractions": {
+        "create": "/api/infractions/create",
+        "update": "/api/infractions/update",
+        "list": "/api/infractions/list",
+        "photos": "/api/infractions/photos"
+      },
+      "agents": {
+        "authenticate": "/api/agents/auth",
+        "sync": "/api/agents/sync",
+        "location": "/api/agents/location"
+      },
+      "zones": {
+        "list": "/api/zones/list",
+        "tariffs": "/api/zones/tariffs",
+        "occupancy": "/api/zones/occupancy"
+      }
+    }
+  },
+  "mysql_tables": {
+    "vehicles": {
+      "table_name": "vehicles",
+      "primary_key": "id",
+      "fields": {
+        "id": "INT AUTO_INCREMENT PRIMARY KEY",
+        "plate": "VARCHAR(10) UNIQUE NOT NULL",
+        "vehicle_type": "ENUM('car', 'motorcycle', 'truck')",
+        "owner_name": "VARCHAR(255)",
+        "owner_document": "VARCHAR(20)",
+        "status": "ENUM('active', 'suspended', 'blocked')",
+        "registration_date": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "last_seen": "TIMESTAMP NULL"
+      }
+    },
+    "tickets": {
+      "table_name": "tickets",
+      "primary_key": "id",
+      "fields": {
+        "id": "INT AUTO_INCREMENT PRIMARY KEY",
+        "plate": "VARCHAR(10) NOT NULL",
+        "zone_id": "INT NOT NULL",
+        "start_time": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "end_time": "TIMESTAMP NOT NULL",
+        "amount_paid": "DECIMAL(10,2) NOT NULL",
+        "payment_method": "ENUM('pix', 'qr_code', 'credit_card')",
+        "payment_status": "ENUM('pending', 'confirmed', 'failed')",
+        "qr_code": "TEXT",
+        "is_valid": "BOOLEAN DEFAULT TRUE"
+      }
+    },
+    "infractions": {
+      "table_name": "infractions",
+      "primary_key": "id",
+      "fields": {
+        "id": "INT AUTO_INCREMENT PRIMARY KEY",
+        "plate": "VARCHAR(10) NOT NULL",
+        "agent_id": "INT NOT NULL",
+        "zone_id": "INT NOT NULL",
+        "infraction_type": "ENUM('no_payment', 'expired_ticket', 'forbidden_zone', 'unregistered_vehicle')",
+        "start_datetime": "TIMESTAMP NOT NULL",
+        "infraction_datetime": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "location_lat": "DECIMAL(10,8)",
+        "location_lng": "DECIMAL(11,8)",
+        "fine_amount": "DECIMAL(10,2)",
+        "observations": "TEXT",
+        "photo_urls": "JSON",
+        "status": "ENUM('pending', 'notified', 'paid', 'contested')",
+        "digital_signature": "TEXT"
+      }
+    },
+    "agents": {
+      "table_name": "agents",
+      "primary_key": "id",
+      "fields": {
+        "id": "INT AUTO_INCREMENT PRIMARY KEY",
+        "name": "VARCHAR(255) NOT NULL",
+        "badge_number": "VARCHAR(20) UNIQUE NOT NULL",
+        "email": "VARCHAR(255)",
+        "phone": "VARCHAR(20)",
+        "status": "ENUM('active', 'inactive', 'on_duty')",
+        "last_location_lat": "DECIMAL(10,8)",
+        "last_location_lng": "DECIMAL(11,8)",
+        "last_sync": "TIMESTAMP NULL"
+      }
+    },
+    "zones": {
+      "table_name": "zones",
+      "primary_key": "id",
+      "fields": {
+        "id": "INT AUTO_INCREMENT PRIMARY KEY",
+        "name": "VARCHAR(255) NOT NULL",
+        "description": "TEXT",
+        "tariff_per_hour": "DECIMAL(10,2) NOT NULL",
+        "max_duration_hours": "INT DEFAULT 4",
+        "geofence_coordinates": "JSON",
+        "status": "ENUM('active', 'inactive', 'maintenance')",
+        "color_code": "VARCHAR(7)"
+      }
+    }
+  },
+  "sync_settings": {
+    "offline_mode": true,
+    "sync_interval_minutes": 5,
+    "max_offline_records": 1000,
+    "retry_attempts": 3,
+    "batch_size": 50
+  }
+}
